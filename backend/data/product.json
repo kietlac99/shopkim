@@ -1,0 +1,128 @@
+[
+  {
+    "name": "Đầm đen",
+    "price": "2000000",
+    "description": "Đầm màu đen",
+    "images": [
+      {
+        "public_id": "black-dress_vyz2he",
+        "url": "https://res.cloudinary.com/dbbwvijcl/image/upload/v1704441342/product/dress/black-dress_vyz2he.jpg"
+      }
+    ],
+    "category": "Đầm",
+    "seller": "Tiki",
+    "stock": "200"
+  },
+  {
+    "name": "Đầm trắng",
+    "price": "1000000",
+    "description": "Đầm màu trắng",
+    "images": [
+      {
+        "public_id": "CelestMaxiDressinCream1_yjxheb",
+        "url": "https://res.cloudinary.com/dbbwvijcl/image/upload/v1704440214/product/dress/CelestMaxiDressinCream1_yjxheb.jpg"
+      }
+    ],
+    "category": "Đầm",
+    "seller": "Shoppe",
+    "stock": "100"
+  },
+  {
+    "name": "Đầm xanh",
+    "price": "3000000",
+    "description": "Đầm màu xanh",
+    "images": [
+      {
+        "public_id": "blue-dress_v8ogmj",
+        "url": "https://res.cloudinary.com/dbbwvijcl/image/upload/v1704441343/product/dress/blue-dress_v8ogmj.jpg"
+      }
+    ],
+    "category": "Đầm",
+    "seller": "Shoppe",
+    "stock": "50"
+  },
+  {
+    "name": "Áo vest đen",
+    "price": "5000000",
+    "description": "Áo vest đen cho nam",
+    "images": [
+      {
+        "public_id": "ao-vest-1_cstwfx",
+        "url": "https://res.cloudinary.com/dbbwvijcl/image/upload/v1704441373/product/ao-vest/ao-vest-1_cstwfx.jpg"
+      }
+    ],
+    "category": "Áo vest",
+    "seller": "Shoppe",
+    "stock": "150"
+  },
+  {
+    "name": "Áo vest trắng",
+    "price": "6000000",
+    "description": "Áo vest trắng cho nữ",
+    "images": [
+      {
+        "public_id": "ao-vest-nu-2_gk3miz",
+        "url": "https://res.cloudinary.com/dbbwvijcl/image/upload/v1704441372/product/ao-vest/ao-vest-nu-2_gk3miz.jpg"
+      }
+    ],
+    "category": "Áo vest",
+    "seller": "Tiki",
+    "stock": "150"
+  },
+  {
+    "name": "Áo vest nâu",
+    "price": "7000000",
+    "description": "Áo vest nâu cho nữ",
+    "images": [
+      {
+        "public_id": "ao-vest-nu_j2hfsz",
+        "url": "https://res.cloudinary.com/dbbwvijcl/image/upload/v1704441371/product/ao-vest/ao-vest-nu_j2hfsz.jpg"
+      }
+    ],
+    "category": "Áo vest",
+    "seller": "Shoppe",
+    "stock": "200"
+  },
+  {
+    "name": "Quần tây đen",
+    "price": "500000",
+    "description": "Quần tây đen",
+    "images": [
+      {
+        "public_id": "quan-tay-den_srw3yl",
+        "url": "https://res.cloudinary.com/dbbwvijcl/image/upload/v1704441394/product/quan-tay/quan-tay-den_srw3yl.jpg"
+      }
+    ],
+    "category": "Quần tây",
+    "seller": "Shoppe",
+    "stock": "200"
+  },
+  {
+    "name": "Quần tây xám",
+    "price": "600000",
+    "description": "Quần tây xám",
+    "images": [
+      {
+        "public_id": "quan-tay-xam-1103-84_gmml8y",
+        "url": "https://res.cloudinary.com/dbbwvijcl/image/upload/v1704441394/product/quan-tay/quan-tay-xam-1103-84_gmml8y.jpg"
+      }
+    ],
+    "category": "Quần tây",
+    "seller": "Tiki",
+    "stock": "100"
+  },
+  {
+    "name": "Quần tây trắng",
+    "price": "700000",
+    "description": "Quần tây trắng",
+    "images": [
+      {
+        "public_id": "quan-tay-nam-cap-cao-sidetab_w0htbl",
+        "url": "https://res.cloudinary.com/dbbwvijcl/image/upload/v1704441392/product/quan-tay/quan-tay-nam-cap-cao-sidetab_w0htbl.jpg"
+      }
+    ],
+    "category": "Quần tây",
+    "seller": "Shoppe",
+    "stock": "100"
+  }
+]
