@@ -8,6 +8,13 @@ import { isAuthenticatedUser, authorizeRoles } from "../../middleware/auth";
 
 const router = new Router();
 
+const errorHandler = (err, req, res, next) => {
+  // Log the error
+  console.error(err.stack);
+  // Send an appropriate response to the client
+  res.status(500).send('Internal Server Error');
+};
+
 router
   .route("/register")
   .post(
@@ -77,5 +84,7 @@ router
     AuthValidator.getMongoDbIdValidator,
     AuthController.deleteUserController
   );
+
+  router.use(errorHandler);
 
 export default router;
