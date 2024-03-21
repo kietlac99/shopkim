@@ -5,7 +5,7 @@ import colors from "colors";
 import * as RedisClient from "../../util/Redis";
 import cloudinary from 'cloudinary';
 
-import { ERROR_CODE } from "../../constants";
+import { ERROR_CODE, DEFAULT_AVATAR } from "../../constants";
 import errorMessage from "../../util/error";
 import { sendEmail } from "../../util/sendEmail";
 import * as Hash from "../../hash";
@@ -35,11 +35,18 @@ export async function registerUserService(name, email, password, avatar) {
 
     const hashedPassword = await Hash.hashPassword(password);
 
-    const result = await cloudinary.v2.uploader.upload(avatar, {
-      folder: 'ShopKim/avatars',
-      width: 150,
-      crop: "scale"
-    });
+    let result = {};
+
+    if (avatar) {
+      result = await cloudinary.v2.uploader.upload(avatar, {
+        folder: 'ShopKim/avatars',
+        width: 150,
+        crop: "scale"
+      });
+    } else {
+      result.public_id = DEFAULT_AVATAR.public_id;
+      result.secure_url = DEFAULT_AVATAR.secure_url;
+    }
 
     const user = await UserModel.create({
       name,
@@ -324,9 +331,12 @@ export async function deleteUserService(id) {
     if (!user)
       return errorMessage(404, `Lỗi, Không tìm thấy người dùng với id : ${id}`);
 
-    const image_id = user.avatar?.public_id;
-    if (image_id) {
-      const res = await cloudinary.v2.uploader.destroy(image_id);
+    if (user.avatar?.public_id !== DEFAULT_AVATAR.public_id)
+    {
+      const image_id = user.avatar?.public_id;
+      if (image_id) {
+        const res = await cloudinary.v2.uploader.destroy(image_id);
+      }
     }
 
     await user.deleteOne();

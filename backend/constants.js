@@ -12,3 +12,8 @@ export const DAY_OF_WEEK = {
   6: "Saturday",
   7: "Sunday",
 };
+
+export const DEFAULT_AVATAR = {
+  'public_id': 'ShopKim/avatars/default_avatar_lvpygb',
+  'secure_url': 'https://res.cloudinary.com/dbbwvijcl/image/upload/v1711007320/ShopKim/avatars/default_avatar_lvpygb.png'
+}

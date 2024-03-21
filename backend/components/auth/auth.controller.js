@@ -7,9 +7,9 @@ import path from 'path';
 
 export async function resgisterUserController(req, res) {
   try {
-    const imageFile = req.file;
+    const imageFile = req?.file;
     
-    const avatar = imageFile.path;
+    const avatar = imageFile?.path;
     
     const removeFilePromise = promisify(fs.unlink);
     try {
@@ -20,10 +20,10 @@ export async function resgisterUserController(req, res) {
         password,
         avatar
       );
-      await removeFilePromise(path.resolve(__dirname, `../../../uploads/${req.file.filename}`));
+      if (avatar) await removeFilePromise(path.resolve(__dirname, `../../../uploads/${req.file.filename}`));
       return res.RH.success(process);
     } catch (error) {
-      await removeFilePromise(path.resolve(__dirname, `../../../uploads/${req.file.filename}`));
+      if (avatar) await removeFilePromise(path.resolve(__dirname, `../../../uploads/${req.file.filename}`));
       return res.RH.error(error);
     }
   } catch (error) {
