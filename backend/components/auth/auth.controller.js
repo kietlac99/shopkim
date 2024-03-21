@@ -7,6 +7,7 @@ import path from 'path';
 
 export async function resgisterUserController(req, res) {
   try {
+    console.log('alo');
     const imageFile = req?.file;
     
     const avatar = imageFile?.path;
