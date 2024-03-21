@@ -27,6 +27,7 @@ export async function resgisterUserController(req, res) {
       return res.RH.error(error);
     }
   } catch (error) {
+    console.log(error);
     return res.RH.error(error);
   }
 }
