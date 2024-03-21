@@ -9,7 +9,7 @@
  */
 import logger from "./logger";
 
-export default function (error, req, res) {
+export default function (error, req, res, next) {
   if (!error.statusCode) {
     logger.error(error.stack);
   }
