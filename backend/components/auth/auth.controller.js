@@ -23,6 +23,7 @@ export async function resgisterUserController(req, res) {
       if (avatar) await removeFilePromise(path.resolve(__dirname, `../../../uploads/${req.file.filename}`));
       return res.RH.success(process);
     } catch (error) {
+      console.log(`1: ${error}`);
       if (avatar) await removeFilePromise(path.resolve(__dirname, `../../../uploads/${req.file.filename}`));
       return res.RH.error(error);
     }
