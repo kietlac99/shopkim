@@ -124,13 +124,6 @@ app.get("/ping", (req, res) => {
   });
 });
 
-app.get('/', (req, res) => {
-  res.json({
-    success: true,
-    message: "Add path /api-docs to go to API page."
-  });
-});
-
 app.use(errorHandler);
 
 export default app;
