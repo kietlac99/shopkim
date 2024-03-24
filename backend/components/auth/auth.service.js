@@ -129,7 +129,7 @@ export async function forgotPasswordService(req) {
 
     await user.save({ validateBeforeSave: false });
 
-    const resetUrl = `${FRONTEND_URL}/password/reset/${resetToken}`;
+    const resetUrl = `${FRONTEND_URL}/#/password/reset/${resetToken}`;
 
     const message = `Your password reset token is as follow:\n\n${resetUrl}\n\nNếu bạn không yêu cầu gửi mail này thì hãy bỏ qua nó.`;
 
