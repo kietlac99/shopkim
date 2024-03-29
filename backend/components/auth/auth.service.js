@@ -123,7 +123,7 @@ export async function forgotPasswordService(req) {
   try {
     const { email } = req.body;
     const user = await UserModel.findOne({ email: email });
-    if (!user) return errorMessage(404, "Lỗi, email không khả dụng!");
+    if (!user) return true;
 
     const resetToken = Hash.getResetPasswordToken(user);
 
