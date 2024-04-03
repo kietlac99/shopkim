@@ -104,7 +104,7 @@ export async function updateOrderService(id, orderStatus) {
       });
 
     order.orderStatus = orderStatus;
-    order.delieverAt = dateNow;
+    order.delivereddAt = dateNow;
 
     await order.save();
 
