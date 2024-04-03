@@ -32,6 +32,10 @@ export async function newOrderService(
       paidAt: dateNow,
       user: id,
     });
+    
+    orderItems.forEach(async (item) => {
+      await updateStockService(item.product, item.quantity);
+    });
 
     return order;
   } catch (error) {
@@ -94,9 +98,9 @@ export async function updateOrderService(id, orderStatus) {
     if (order.orderStatus === "Đã giao")
       return errorMessage(400, "Lỗi, đơn hàng này đã được giao");
 
-    if (orderStatus === "Đã giao")
+    if (orderStatus === "Hủy")
       order.orderItems.forEach(async (item) => {
-        await updateStockService(item.product, item.quantity);
+        await updateStockService(item.product, - item.quantity);
       });
 
     order.orderStatus = orderStatus;
