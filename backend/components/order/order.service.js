@@ -94,9 +94,10 @@ export async function updateOrderService(id, orderStatus) {
     if (order.orderStatus === "Đã giao")
       return errorMessage(400, "Lỗi, đơn hàng này đã được giao");
 
-    order.orderItems.forEach(async (item) => {
-      await updateStockService(item.product, item.quantity);
-    });
+    if (orderStatus === "Đã giao")
+      order.orderItems.forEach(async (item) => {
+        await updateStockService(item.product, item.quantity);
+      });
 
     order.orderStatus = orderStatus;
     order.delieverAt = dateNow;
