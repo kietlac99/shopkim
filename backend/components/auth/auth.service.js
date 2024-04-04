@@ -123,7 +123,7 @@ export async function forgotPasswordService(req) {
   try {
     const { email } = req.body;
     const user = await UserModel.findOne({ email: email });
-    if (!user) return true;
+    if (!user) return `Email sent to: ${email}`;
 
     const resetToken = Hash.getResetPasswordToken(user);
 
