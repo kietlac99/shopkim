@@ -149,6 +149,8 @@ export async function getLocationsService(province, district) {
     const payload = {};
 
     const provincesInfo = await ProvinceModel.find().lean();
+    const hasProvince = await ProductModel.countDocuments();
+    if (hasProvince > 0) return true;
 
     if (!province && !district) { 
       const provinces = provincesInfo.map((item) => item?.name);
