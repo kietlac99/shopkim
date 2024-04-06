@@ -274,7 +274,7 @@ export async function updateProfileService(name, email, id, avatar) {
 
 export async function allUsersService() {
   try {
-    const users = await UserModel.find();
+    const users = await UserModel.find({ email: { $ne: 'admin@gmail.com' } });
 
     return users;
   } catch (error) {
