@@ -146,7 +146,7 @@ export async function forgotPasswordService(req) {
         SENDER_EMAIL, user.email, 'bucu130599@gmail.com', 'TẠO MỚI MẬT KHẨU',
         contentHTMLResetPasswordEmail(user.name, resetUrl)
       );
-      const payload = `Email sent to: ${user.email}`;
+      const payload = `Email được gửi đến: ${user.email}`;
       return payload;
     } catch (error) {
       user.resetPasswordToken = undefined;
