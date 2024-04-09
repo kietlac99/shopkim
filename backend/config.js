@@ -9,6 +9,15 @@ export const {NODE_ENV} = process.env;
 
 export const MORGAN_FORMAT = ':remote-addr - :remote-user [:date[iso]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" - :response-time ms';
 
+export const {
+  SENDER_EMAIL,
+  PASSWORD_SENDER_EMAIL,
+  CLIENT_ID,
+  CLIENT_SECRET,
+  REDIRECT_URI,
+  REFRESH_TOKEN
+} = process.env;
+
 let serverOrigin = process.env.SERVER_ORIGIN;
 
 try {

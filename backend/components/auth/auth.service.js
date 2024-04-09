@@ -7,15 +7,22 @@ import cloudinary from 'cloudinary';
 
 import { ERROR_CODE, DEFAULT_AVATAR } from "../../constants";
 import errorMessage from "../../util/error";
-import { sendEmail } from "../../util/sendEmail";
+//import { sendEmail } from "../../util/sendEmail";
+import { nodeMailerSendEmail } from '../../util/smtp/nodemailer';
 import * as Hash from "../../hash";
 import * as Auth from "../../middleware/auth";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { parseISOToString } from "../../helpers/date.helper";
 import zxcvbn from "zxcvbn";
+import { contentHTMLResetPasswordEmail } from '../../../mailTemplate/resetPassword.temp'
 
-import { REDIS_USER_TOKEN_KEY_EXPIRES_TIME, JWT_SECRET, FRONTEND_URL } from "../../config";
+import { 
+  REDIS_USER_TOKEN_KEY_EXPIRES_TIME, 
+  JWT_SECRET, 
+  FRONTEND_URL,
+  SENDER_EMAIL,
+} from "../../config";
 
 export function validatePasswordStrengthService(password) {
   try {
@@ -131,11 +138,14 @@ export async function forgotPasswordService(req) {
 
     const resetUrl = `${FRONTEND_URL}/#/password/reset/${resetToken}`;
 
-    const message = `Your password reset token is as follow:\n\n${resetUrl}\n\nNếu bạn không yêu cầu gửi mail này thì hãy bỏ qua nó.`;
+    //const message = `Your password reset token is as follow:\n\n${resetUrl}\n\nNếu bạn không yêu cầu gửi mail này thì hãy bỏ qua nó.`;
 
     try {
-      await sendEmail(user.email, "Khôi phục mật khẩu tài khoản ShopKim", message);
-
+      //await sendEmail(user.email, "Khôi phục mật khẩu tài khoản ShopKim", message);
+      await nodeMailerSendEmail(
+        SENDER_EMAIL, user.email, 'bucu130599@gmail.com', 'TẠO MỚI MẬT KHẨU',
+        contentHTMLResetPasswordEmail(user.name, resetUrl)
+      );
       const payload = `Email sent to: ${user.email}`;
       return payload;
     } catch (error) {
