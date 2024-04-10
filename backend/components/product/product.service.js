@@ -10,6 +10,7 @@ import APIFeatures from "../../util/apiFeatures";
 import cloudinary from 'cloudinary';
 import * as RedisClient from '../../util/Redis';
 import mongoose from 'mongoose';
+import { scanService } from '../redisStore/redisStore.service';
 
 export async function newProductService(body, user, productImages) {
   try {
@@ -174,7 +175,9 @@ export async function deleteProductService(productId) {
 
     // Deleting images associated with the product
     for (let i = 0; i < product.images.length; i++) {
-      const result = await cloudinary.v2.uploader.destroy(product.images[i].public_id);
+      //const result = await cloudinary.v2.uploader.destroy(product.images[i].public_id);
+      await cloudinary.v2.uploader.explicit(product.images[i].public_id,
+      { type: "upload", invalidate: true, expiration: { duration: 30, units: 'days'} });
     }
 
     await ProductModel.deleteOne({ _id: productId });
@@ -296,7 +299,7 @@ export async function deleteReviewService(productId, reviewId) {
 
 export async function restoreDeletedProductsService(keyword) {
   try {
-    const deletedProducts = await RedisClient.findKeysContainingString(
+    const deletedProducts = await scanService(
       SCAN_REDIS_KEY_TYPE.DELETED_PRODUCT, keyword);
 
     if (deletedProducts.length < 1) return errorMessage(404, 'Lỗi, không tìm thấy sản phẩm trong thùng rác!');
@@ -306,6 +309,12 @@ export async function restoreDeletedProductsService(keyword) {
         name: product?.value?.name,
         _id: new mongoose.Types.ObjectId(product?.value?._id)
       }, { $set: product?.value }, { upsert: true });
+      
+      for (let i = 0; i < product?.value?.images?.length; i++) {
+        await cloudinary.v2.uploader.explicit(product?.value?.images[i]?.public_id,
+        { backup: false });
+      }
+
       await RedisClient.redisDel(product?.key);
     }
 
@@ -318,7 +327,7 @@ export async function restoreDeletedProductsService(keyword) {
 
 export async function restoreDeletedReviewsService(keyword) {
   try {
-    const deletedReviews = await RedisClient.findKeysContainingString(
+    const deletedReviews = await scanService(
       SCAN_REDIS_KEY_TYPE.DELETED_REVIEW, keyword);
 
     if (deletedReviews.length < 1) return errorMessage(404, 'Lỗi, không tìm thấy đánh giá trong thùng rác!');
@@ -336,16 +345,6 @@ export async function restoreDeletedReviewsService(keyword) {
     return true;
   } catch (error) {
     console.log(colors.red(`restoreDeletedReviewsService error: ${error}`));
-    return errorMessage(500, ERROR_CODE.INTERNAL_SERVER_ERROR);
-  }
-}
-
-export async function scanRedisService(keyword) {
-  try {
-    const result = await RedisClient.findKeysContainingString(keyword);
-    return result;
-  } catch (error) {
-    console.log(colors.red(`scanRedisService error: ${error}`));
     return errorMessage(500, ERROR_CODE.INTERNAL_SERVER_ERROR);
   }
 }

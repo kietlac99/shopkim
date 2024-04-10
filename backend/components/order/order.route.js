@@ -50,4 +50,12 @@ router.route('/location')
     OrderController.getLocationsController
   );
 
+router.route('/restore-deleted-orders')
+  .post(
+    isAuthenticatedUser(),
+    authorizeRoles("admin"),
+    OrderValidator.restoreDeletedOrdersValidator,
+    OrderController.restoreDeletedOrderController
+  )
+
 export default router;
