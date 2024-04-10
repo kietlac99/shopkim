@@ -2,7 +2,7 @@
 /* eslint-disable require-jsdoc */
 import colors from "colors";
 
-import { ERROR_CODE, EXPIRES_TIME_CHANGE } from "../../constants";
+import { ERROR_CODE, EXPIRES_TIME_CHANGE, SCAN_REDIS_KEY_TYPE } from "../../constants";
 import errorMessage from "../../util/error";
 
 import ProductModel from "../../schema/product.model";
@@ -296,10 +296,10 @@ export async function deleteReviewService(productId, reviewId) {
 
 export async function restoreDeletedProductsService(keyword) {
   try {
-    let deletedProducts = await RedisClient.findKeysContainingString(keyword);
-    if (deletedProducts) keyword = 'DELETED_PRODUCT';
+    const deletedProducts = await RedisClient.findKeysContainingString(
+      SCAN_REDIS_KEY_TYPE.DELETED_PRODUCT, keyword);
 
-    deletedProducts = await RedisClient.findKeysContainingString(keyword);
+    if (deletedProducts.length < 1) return errorMessage(404, 'Lỗi, không tìm thấy sản phẩm trong thùng rác!');
 
     for(const product of deletedProducts) {
       await ProductModel.findOneAndUpdate({
@@ -318,10 +318,10 @@ export async function restoreDeletedProductsService(keyword) {
 
 export async function restoreDeletedReviewsService(keyword) {
   try {
-    let deletedReviews= await RedisClient.findKeysContainingString(keyword);
-    if (deletedReviews) keyword = 'DELETED_REVIEW';
+    const deletedReviews = await RedisClient.findKeysContainingString(
+      SCAN_REDIS_KEY_TYPE.DELETED_REVIEW, keyword);
 
-    deletedReviews = await RedisClient.findKeysContainingString(keyword);
+    if (deletedReviews.length < 1) return errorMessage(404, 'Lỗi, không tìm thấy đánh giá trong thùng rác!');
 
     for(const review of deletedReviews) {
       const rating = review?.value?.review?.rating;
