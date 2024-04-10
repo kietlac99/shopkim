@@ -15,7 +15,7 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { parseISOToString } from "../../helpers/date.helper";
 import zxcvbn from "zxcvbn";
-import { contentHTMLResetPasswordEmail } from '../../../mailTemplate/resetPassword.temp'
+import { contentHTMLResetPasswordEmail } from '../../../mailTemplate/resetPassword.temp';
 
 import { 
   REDIS_USER_TOKEN_KEY_EXPIRES_TIME, 
@@ -340,6 +340,14 @@ export async function deleteUserService(id) {
 
     if (!user)
       return errorMessage(404, `Lỗi, Không tìm thấy người dùng với id : ${id}`);
+
+    const keyExpiresTime = 30 * EXPIRES_TIME_CHANGE;
+    const deleteKey = `DELETED_USER_${user._id}_${user.email}_${user.name}`;
+    await RedisClient.setTextByKey(
+      deleteKey,
+      keyExpiresTime,
+      JSON.stringify(user)
+    );
 
     if (user.avatar?.public_id !== DEFAULT_AVATAR.public_id)
     {

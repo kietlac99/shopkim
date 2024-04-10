@@ -73,12 +73,6 @@ router
   );
 
 router
-  .route('/scan')
-  .post(
-    ProductController.scanRedisController
-  );
-
-router
   .route('/restore-deleted-product')
   .post(
     isAuthenticatedUser(),

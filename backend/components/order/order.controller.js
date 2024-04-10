@@ -92,3 +92,13 @@ export async function getLocationsController(req, res) {
     return res.RH.error(error);
   }
 }
+
+export async function restoreDeletedOrderController(req, res) {
+  try {
+    const { keyword } = req.body;
+    const process= await OrderService.restoreDeletedOrderService(keyword);
+    return res.RH.success(process);
+  } catch (error) {
+    return res.RH.error(error);
+  }
+}

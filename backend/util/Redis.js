@@ -71,11 +71,6 @@ export async function timeRemaining(key) {
 
 export async function findKeysContainingString(scanType, searchString) {
   const results = [];
-  await scan(scanType, searchString, results);
-  return results;
-}
-
-export async function scan(scanType, searchString, results) {
   for await (const key of client.scanIterator()) {
     // use the key!
     if (key.includes(scanType) && key.includes(searchString) ) {
@@ -83,6 +78,7 @@ export async function scan(scanType, searchString, results) {
       results.push({ key, value: JSON.parse(value) });
     }
   }
+  return results;
 }
 
 export default client;

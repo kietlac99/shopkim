@@ -15,3 +15,8 @@ export const updateOrderValidator = [
     .withMessage("Lỗi, trạng thái đơn đặt hàng đang trống!"),
   validatorErrorHandler,
 ];
+
+export const restoreDeletedOrdersValidator = [
+  body('keyword').isString().withMessage('Lỗi, từ khóa không hợp lệ!'),
+  validatorErrorHandler
+]

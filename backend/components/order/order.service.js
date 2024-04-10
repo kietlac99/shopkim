@@ -6,8 +6,12 @@ import ProvinceModel from '../../schema/province.model';
 
 import colors from "colors";
 import { parseISOToString } from "../../helpers/date.helper";
-import { ERROR_CODE } from "../../constants";
+import { ERROR_CODE, SCAN_REDIS_KEY_TYPE, EXPIRES_TIME_CHANGE } from "../../constants";
 import errorMessage from "../../util/error";
+import * as RedisClient from '../../util/Redis';
+
+import { scanService } from '../redisStore/redisStore.service';
+import mongoose from 'mongoose';
 
 export async function newOrderService(
   orderItems,
@@ -132,6 +136,14 @@ export async function deleteOrderService(id) {
   try {
     const order = await OrderModel.findById(id);
 
+    const keyExpiresTime = 30 * EXPIRES_TIME_CHANGE;
+    const deleteKey = `DELETED_ORDER_${order._id}_${order.user}_${order.paymentInfo?.id}_${order.totalPrice}_${order.orderStatus}`;
+    await RedisClient.setTextByKey(
+      deleteKey,
+      keyExpiresTime,
+      JSON.stringify(order)
+    );
+
     if (!order)
       return errorMessage(404, "Lỗi, không tìm thấy đơn đặt hàng với id này!");
 
@@ -181,6 +193,26 @@ export async function getLocationsService(province, district) {
     return payload;
   } catch (error) {
     console.log(colors.red(`getDistrictByProvinceService error: ${error}`));
+    return errorMessage(500, ERROR_CODE.INTERNAL_SERVER_ERROR);
+  }
+}
+
+export async function restoreDeletedOrderService(keyword) {
+  try {
+    const deletedOrders = await scanService(
+      SCAN_REDIS_KEY_TYPE.DELETED_ORDER, keyword);
+
+    if (deletedOrders.length < 1) return errorMessage(404, 'Lỗi, không tìm thấy đơn hàng trong thùng rác!');
+    for(const order of deletedOrders) {
+      await OrderModel.findOneAndUpdate({
+        _id: new mongoose.Types.ObjectId(order?.value?._id),
+        user: new mongoose.Types.ObjectId(order?.value?.user)
+      }, { $set: order?.value }, { upsert: true });
+      await RedisClient.redisDel(order?.key);
+    }
+    return true;
+  } catch (error) {
+    console.log(colors.red(`restoreDeletedOrderService error: ${error}`));
     return errorMessage(500, ERROR_CODE.INTERNAL_SERVER_ERROR);
   }
 }

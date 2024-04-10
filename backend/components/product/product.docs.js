@@ -454,57 +454,6 @@
 
 /**
  * @swagger
- * /product/scan:
- *   post:
- *     summary: Scan redis key
- *     tags:
- *       - Product
- *     parameters:
- *       - name: body
- *         in: body
- *         required: true
- *         properties:
- *           keyword:
- *             type: String
- *         example: {
- *           "keyword": ""
- *         }
- *     responses:
- *       200:
- *         name: body
- *         in: body
- *         required: true
- *         description: data report
- *         schema:
- *           type: object
- *           properties:
- *             $ref: '#/definitions/dashboard'
- *           example: {
- *              success: true
- *           }
- *       404:
- *         description: When data cannot be process
- *         schema:
- *           type: array
- *           items:
- *             type: object
- *             properties:
- *               $ref: '#/definitions/ValidatorErrorItem'
- *           example: {
- *             success: false,
- *             errors: {
- *                 "param": "EXISTS",
- *               }
- *           }
- *       500:
- *         description: When got server exception
- *         schema:
- *           type: string
- *           example: "Internal server error"
- */
-
-/**
- * @swagger
  * /product/restore-deleted-product:
  *   post:
  *     summary: Restore deleted product
