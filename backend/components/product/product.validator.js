@@ -79,3 +79,8 @@ export const deleteReviewValidator = [
   query("reviewId").isMongoId().withMessage("Id sản phẩm không hợp lệ!"),
   validatorErrorHandler,
 ];
+
+export const restoreDeletedProductValidator = [
+  body('keyword').isString().withMessage('Từ khóa không hợp lệ!'),
+  validatorErrorHandler
+]
