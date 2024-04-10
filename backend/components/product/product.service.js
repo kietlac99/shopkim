@@ -2,12 +2,14 @@
 /* eslint-disable require-jsdoc */
 import colors from "colors";
 
-import { ERROR_CODE } from "../../constants";
+import { ERROR_CODE, EXPIRES_TIME_CHANGE } from "../../constants";
 import errorMessage from "../../util/error";
 
 import ProductModel from "../../schema/product.model";
 import APIFeatures from "../../util/apiFeatures";
 import cloudinary from 'cloudinary';
+import * as RedisClient from '../../util/Redis';
+import mongoose from 'mongoose';
 
 export async function newProductService(body, user, productImages) {
   try {
@@ -161,6 +163,14 @@ export async function deleteProductService(productId) {
     if (!product) {
       return errorMessage(404, ERROR_CODE.NOT_FOUND_ERROR);
     }
+    
+    const keyExpiresTime = 30 * EXPIRES_TIME_CHANGE;
+    const deleteKey = `DELETED_PRODUCT_${product.name}_${product._id}`;
+    await RedisClient.setTextByKey(
+      deleteKey,
+      keyExpiresTime,
+      JSON.stringify(product)
+    );
 
     // Deleting images associated with the product
     for (let i = 0; i < product.images.length; i++) {
@@ -192,6 +202,8 @@ export async function createProductReviewService(
     };
 
     const product = await ProductModel.findById(productId);
+
+    if (!product) return errorMessage(404, 'Lỗi, không tìm thấy sản phẩm!');
 
     const isReviewed = product.reviews.find(
       (r) => r.user.toString() === userId.toString()
@@ -241,11 +253,25 @@ export async function deleteReviewService(productId, reviewId) {
       (review) => review._id.toString() !== reviewId.toString()
     );
 
+    const deletedReview = product.reviews.find(
+      (review) => review._id.toString() === reviewId.toString()
+    );
+
     const numOfReviews = reviews.length;
 
-    const ratings =
-      product.reviews.reduce((acc, item) => item.rating + acc, 0) /
-      reviews.length;
+    const ratings = reviews.reduce((acc, item) => item.rating + acc, 0) / numOfReviews;
+    
+    const keyExpiresTime = 30 * EXPIRES_TIME_CHANGE;
+    const deleteKey = `DELETED_REVIEW_${deletedReview.rating}_${deletedReview.comment}_${product.name}_${product._id}_${deletedReview.user}`;
+    const deletedData = {
+      productId,
+      review: deletedReview
+    }
+    await RedisClient.setTextByKey(
+      deleteKey,
+      keyExpiresTime,
+      JSON.stringify(deletedData)
+    );
 
     await ProductModel.findByIdAndUpdate(
       productId,
@@ -264,6 +290,62 @@ export async function deleteReviewService(productId, reviewId) {
     return true;
   } catch (error) {
     console.log(colors.red(`deleteReviewService error: ${error}`));
+    return errorMessage(500, ERROR_CODE.INTERNAL_SERVER_ERROR);
+  }
+}
+
+export async function restoreDeletedProductsService(keyword) {
+  try {
+    let deletedProducts = await RedisClient.findKeysContainingString(keyword);
+    if (deletedProducts) keyword = 'DELETED_PRODUCT';
+
+    deletedProducts = await RedisClient.findKeysContainingString(keyword);
+
+    for(const product of deletedProducts) {
+      await ProductModel.findOneAndUpdate({
+        name: product?.value?.name,
+        _id: new mongoose.Types.ObjectId(product?.value?._id)
+      }, { $set: product?.value }, { upsert: true });
+      await RedisClient.redisDel(product?.key);
+    }
+
+    return true;
+  } catch (error) {
+    console.log(colors.red(`restoreDeletedProduct error: ${error}`));
+    return errorMessage(500, ERROR_CODE.INTERNAL_SERVER_ERROR);
+  }
+}
+
+export async function restoreDeletedReviewsService(keyword) {
+  try {
+    let deletedReviews= await RedisClient.findKeysContainingString(keyword);
+    if (deletedReviews) keyword = 'DELETED_REVIEW';
+
+    deletedReviews = await RedisClient.findKeysContainingString(keyword);
+
+    for(const review of deletedReviews) {
+      const rating = review?.value?.review?.rating;
+      const comment = review?.value?.review?.comment;
+      const productId = review?.value?.productId;
+      const userId = review?.value?.review?.user;
+      const userName = review?.value?.review?.name;
+      await createProductReviewService(rating, comment, productId, userId, userName);
+      await RedisClient.redisDel(review?.key);
+    }
+
+    return true;
+  } catch (error) {
+    console.log(colors.red(`restoreDeletedReviewsService error: ${error}`));
+    return errorMessage(500, ERROR_CODE.INTERNAL_SERVER_ERROR);
+  }
+}
+
+export async function scanRedisService(keyword) {
+  try {
+    const result = await RedisClient.findKeysContainingString(keyword);
+    return result;
+  } catch (error) {
+    console.log(colors.red(`scanRedisService error: ${error}`));
     return errorMessage(500, ERROR_CODE.INTERNAL_SERVER_ERROR);
   }
 }

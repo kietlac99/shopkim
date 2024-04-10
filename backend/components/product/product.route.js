@@ -72,4 +72,28 @@ router
     ProductController.deleteReviewController
   );
 
+router
+  .route('/scan')
+  .post(
+    ProductController.scanRedisController
+  );
+
+router
+  .route('/restore-deleted-product')
+  .post(
+    isAuthenticatedUser(),
+    authorizeRoles('admin'),
+    ProductValidator.restoreDeletedProductValidator,
+    ProductController.restoreDeletedProductsController
+  );
+
+router
+  .route('/restore-deleted-reviews')
+  .post(
+    isAuthenticatedUser(),
+    authorizeRoles('admin'),
+    ProductValidator.restoreDeletedProductValidator,
+    ProductController.restoreDeletedReviewsController
+  );
+
 export default router;

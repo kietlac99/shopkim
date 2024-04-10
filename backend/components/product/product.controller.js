@@ -134,3 +134,33 @@ export async function deleteReviewController(req, res) {
     return res.RH.error(error);
   }
 }
+
+export async function restoreDeletedProductsController(req, res) {
+  try {
+    const { keyword } = req.body;
+    const process = await ProductService.restoreDeletedProductsService(keyword);
+    return res.RH.success(process);
+  } catch (error) {
+    return res.RH.error(error);
+  }
+}
+
+export async function restoreDeletedReviewsController(req, res) {
+  try {
+    const { keyword } = req.body;
+    const process = await ProductService.restoreDeletedReviewsService(keyword);
+    return res.RH.success(process);
+  } catch (error) {
+    return res.RH.error(error);
+  }
+}
+
+export async function scanRedisController(req, res) {
+  try {
+    const { keyword } = req.body;
+    const process = await ProductService.scanRedisService(keyword);
+    return res.RH.success(process);
+  } catch (error) {
+    return res.RH.error(error);
+  }
+}

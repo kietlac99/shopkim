@@ -69,4 +69,20 @@ export async function timeRemaining(key) {
   return payload;
 }
 
+export async function findKeysContainingString(searchString) {
+  const results = [];
+  await scan(searchString, results);
+  return results;
+}
+
+export async function scan(searchString, results) {
+  for await (const key of client.scanIterator()) {
+    // use the key!
+    if (key.includes(searchString)) {
+      const value = await client.get(key);
+      results.push({ key, value: JSON.parse(value) });
+    }
+  }
+}
+
 export default client;
