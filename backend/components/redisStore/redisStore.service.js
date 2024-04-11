@@ -1,6 +1,7 @@
 import * as RedisClient from '../../util/Redis';
 import colors from "colors";
 import errorMessage from "../../util/error";
+import { ERROR_CODE } from '../../constants';
 
 export async function scanService(scanType, keyword) {
     try {

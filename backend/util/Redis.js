@@ -59,14 +59,12 @@ export async function redisDel(key) {
 }
 
 export async function timeRemaining(key) {
-  const payload = await client.ttl(key, (error, reply) => {
+  return await client.ttl(key, (error, reply) => {
     if (error) {
-      console.log(`timeRemaining error: ${error}`);
       return reject(error);
     }
     return resolve(reply);
   });
-  return payload;
 }
 
 export async function findKeysContainingString(scanType, searchString) {

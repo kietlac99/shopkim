@@ -5,7 +5,7 @@ import colors from "colors";
 import * as RedisClient from "../../util/Redis";
 import cloudinary from 'cloudinary';
 
-import { ERROR_CODE, DEFAULT_AVATAR } from "../../constants";
+import { ERROR_CODE, DEFAULT_AVATAR, EXPIRES_TIME_CHANGE, SCAN_REDIS_KEY_TYPE } from "../../constants";
 import errorMessage from "../../util/error";
 //import { sendEmail } from "../../util/sendEmail";
 import { nodeMailerSendEmail } from '../../util/smtp/nodemailer';
@@ -16,6 +16,7 @@ import crypto from "crypto";
 import { parseISOToString } from "../../helpers/date.helper";
 import zxcvbn from "zxcvbn";
 import { contentHTMLResetPasswordEmail } from '../../../mailTemplate/resetPassword.temp';
+import mongoose from 'mongoose';
 
 import { 
   REDIS_USER_TOKEN_KEY_EXPIRES_TIME, 
@@ -341,7 +342,7 @@ export async function deleteUserService(id) {
     if (!user)
       return errorMessage(404, `Lỗi, Không tìm thấy người dùng với id : ${id}`);
 
-    const keyExpiresTime = 30 * EXPIRES_TIME_CHANGE;
+    const keyExpiresTime = 31 * EXPIRES_TIME_CHANGE;
     const deleteKey = `DELETED_USER_${user._id}_${user.email}_${user.name}`;
     await RedisClient.setTextByKey(
       deleteKey,
@@ -349,19 +350,42 @@ export async function deleteUserService(id) {
       JSON.stringify(user)
     );
 
-    if (user.avatar?.public_id !== DEFAULT_AVATAR.public_id)
-    {
-      const image_id = user.avatar?.public_id;
-      if (image_id) {
-        const res = await cloudinary.v2.uploader.destroy(image_id);
-      }
-    }
-
     await user.deleteOne();
 
     return true;
   } catch (error) {
     console.log(colors.red(`deleteUserService error: ${error}`));
+    return errorMessage(500, ERROR_CODE.INTERNAL_SERVER_ERROR);
+  }
+}
+
+export async function restoreDeletedUserService(keyword) {
+  try {
+    const deletedUsers = await RedisClient.findKeysContainingString(
+      SCAN_REDIS_KEY_TYPE.DELETED_USER, keyword);
+
+    if (deletedUsers.length < 1) return errorMessage(404, 'Lỗi, không tìm thấy sản phẩm trong thùng rác!');
+
+    let hasDeletedKey = false;
+    for(const user of deletedUsers) {
+      const time = await RedisClient.timeRemaining(user?.key);
+      if (time <= EXPIRES_TIME_CHANGE) {
+        continue;
+      } else hasDeletedKey = true;
+      
+      await UserModel.findOneAndUpdate({
+        name: user?.value?.email,
+        _id: new mongoose.Types.ObjectId(user?.value?._id)
+      }, { $set: user?.value }, { upsert: true });
+      
+      await RedisClient.redisDel(user?.key);
+    }
+
+    if (!hasDeletedKey) return errorMessage(404, 'Lỗi, không tìm thấy người dùng trong thùng rác!');
+
+    return true;
+  } catch (error) {
+    console.log(colors.red(`restoreDeletedUserService error: ${error}`));
     return errorMessage(500, ERROR_CODE.INTERNAL_SERVER_ERROR);
   }
 }

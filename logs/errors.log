@@ -12,3 +12,14 @@
 2024-03-21T06:40:48.930Z error: undefined
 2024-03-21T06:41:23.657Z error: undefined
 2024-03-21T06:41:33.014Z error: undefined
+2024-04-10T07:49:44.803Z error: TypeError: Cannot read properties of undefined (reading 'role')
+    at D:\fileBT\doantotnghiep\EcomerceShop\backend\backend\middleware\/auth.js:89:36
+    at Layer.handle [as handle_request] (D:\fileBT\doantotnghiep\EcomerceShop\backend\node_modules\express\lib\router\layer.js:95:5)
+    at next (D:\fileBT\doantotnghiep\EcomerceShop\backend\node_modules\express\lib\router\route.js:144:13)
+    at call (D:\fileBT\doantotnghiep\EcomerceShop\backend\backend\middleware\/auth.js:81:14)
+    at tryCatch (D:\fileBT\doantotnghiep\EcomerceShop\backend\backend\middleware\/auth.js:2:1)
+    at Generator._invoke (D:\fileBT\doantotnghiep\EcomerceShop\backend\backend\middleware\/auth.js:2:1)
+    at Generator.throw (D:\fileBT\doantotnghiep\EcomerceShop\backend\backend\middleware\/auth.js:2:1)
+    at asyncGeneratorStep (D:\fileBT\doantotnghiep\EcomerceShop\backend\backend\middleware\/auth.js:2:1)
+    at _throw (D:\fileBT\doantotnghiep\EcomerceShop\backend\backend\middleware\/auth.js:2:1)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
