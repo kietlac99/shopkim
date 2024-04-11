@@ -6,6 +6,7 @@ import colors from 'colors';
 
 import logger from './api/logger';
 // import dummySomeData from './util/seeder';
+import cronJob from '../cron/cron';
 
 import {
   PORT,
@@ -46,6 +47,9 @@ httpServer.listen(PORT, async (error) => {
   if (error) {
     console.log(`Cannot start server: ${error}`);
   } else {
+    if (NODE_ENV === 'PRODUCTION' || NODE_ENV === 'DEVELOPMENT') {
+      cronJob();
+    }
     console.log(colors.green(`Server started on PORT: ${PORT} in ${NODE_ENV} mode.`));
   }
 });
