@@ -676,14 +676,14 @@
 
 /**
  * @swagger
- * /auth/register/email-confirm:
+ * /auth/register/email-confirm/{email}:
  *   post:
  *     summary: Email confirm
  *     tags:
  *       - Auth
  *     parameters:
  *       - name: email
- *         in: query
+ *         in: path
  *         type: String
  *     responses:
  *       200:

@@ -33,7 +33,7 @@ export async function resgisterUserController(req, res) {
 
 export async function emailConfirmController(req, res) {
   try {
-    const { email } = req.query;
+    const { email } = req.params;
     const process = await AuthService.emailConfirmService(email);
     return res.RH.success(process);
   } catch (error) {
