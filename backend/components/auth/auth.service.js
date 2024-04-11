@@ -58,7 +58,7 @@ export async function registerUserService(name, email, password, avatar) {
 
     const confirmUrl = `${FRONTEND_URL}/#/register/confirm/${email}`;
 
-    const keyExpiresTime = 31 * 60;
+    const keyExpiresTime = EXPIRES_TIME_CHANGE;
     const redisKey = `USER_REGISTRATION_${email}`;
     await RedisClient.setTextByKey(
       redisKey,
@@ -89,12 +89,12 @@ export async function registerUserService(name, email, password, avatar) {
 export async function emailConfirmService(email) {
   try {
     const userRegister = await RedisClient.findKeysContainingString
-      (USER_REGISTRATION, email);
+      (SCAN_REDIS_KEY_TYPE.USER_REGISTRATION, email);
     if (userRegister.length < 1) return 'Link đã hết hạn!';
     let token = null;
     for(const user of userRegister) {
       const time = await RedisClient.timeRemaining(user?.key);
-      if (time <= 60) {
+      if (time <= (EXPIRES_TIME_CHANGE - 30 * 60)) {
         return 'Link đã hết hạn!';
       }
 
