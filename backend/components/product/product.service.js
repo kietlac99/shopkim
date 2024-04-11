@@ -165,20 +165,13 @@ export async function deleteProductService(productId) {
       return errorMessage(404, ERROR_CODE.NOT_FOUND_ERROR);
     }
     
-    const keyExpiresTime = 30 * EXPIRES_TIME_CHANGE;
+    const keyExpiresTime = 31 * EXPIRES_TIME_CHANGE;
     const deleteKey = `DELETED_PRODUCT_${product.name}_${product._id}`;
     await RedisClient.setTextByKey(
       deleteKey,
       keyExpiresTime,
       JSON.stringify(product)
     );
-
-    // Deleting images associated with the product
-    for (let i = 0; i < product.images.length; i++) {
-      //const result = await cloudinary.v2.uploader.destroy(product.images[i].public_id);
-      await cloudinary.v2.uploader.explicit(product.images[i].public_id,
-      { type: "upload", invalidate: true, expiration: { duration: 30, units: 'days'} });
-    }
 
     await ProductModel.deleteOne({ _id: productId });
     const result = "Product is deleted!";
@@ -304,19 +297,22 @@ export async function restoreDeletedProductsService(keyword) {
 
     if (deletedProducts.length < 1) return errorMessage(404, 'Lỗi, không tìm thấy sản phẩm trong thùng rác!');
 
+    let hasDeletedKey = false;
     for(const product of deletedProducts) {
+      const time = await RedisClient.timeRemaining(product?.key);
+      if (time <= EXPIRES_TIME_CHANGE) {
+        continue;
+      } else hasDeletedKey = true;
+      
       await ProductModel.findOneAndUpdate({
         name: product?.value?.name,
         _id: new mongoose.Types.ObjectId(product?.value?._id)
       }, { $set: product?.value }, { upsert: true });
       
-      for (let i = 0; i < product?.value?.images?.length; i++) {
-        await cloudinary.v2.uploader.explicit(product?.value?.images[i]?.public_id,
-        { backup: false });
-      }
-
       await RedisClient.redisDel(product?.key);
     }
+
+    if (!hasDeletedKey) return errorMessage(404, 'Lỗi, không tìm thấy sản phẩm trong thùng rác!');
 
     return true;
   } catch (error) {

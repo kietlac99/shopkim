@@ -85,6 +85,15 @@ router
     AuthController.deleteUserController
   );
 
-  router.use(errorHandler);
+router
+  .route('/admin/restore-deleted-users')
+  .post(
+    isAuthenticatedUser(),
+    authorizeRoles("admin"),
+    AuthValidator.restoreDeletedUserValidator,
+    AuthController.restoreDeletedUserController
+  )
+
+router.use(errorHandler);
 
 export default router;

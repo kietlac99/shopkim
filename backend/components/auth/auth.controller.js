@@ -168,3 +168,13 @@ export async function deleteUserController(req, res) {
     return res.RH.error(error);
   }
 }
+
+export async function restoreDeletedUserController(req, res) {
+  try {
+    const { keyword } = req.body;
+    const process = await AuthService.restoreDeletedUserService(keyword);
+    return res.RH.success(process);
+  } catch (error) {
+    return res.RH.error(error);
+  }
+}

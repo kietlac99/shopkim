@@ -49,3 +49,8 @@ export const updateUserValidator = [
     .withMessage("Lỗi, quyền chỉ có admin hoặc user!"),
   validatorErrorHandler,
 ];
+
+export const restoreDeletedUserValidator = [
+  body('keyword').isString().withMessage('Lỗi, từ khóa không khả dụng'),
+  validatorErrorHandler
+]
