@@ -90,12 +90,12 @@ export async function emailConfirmService(email) {
   try {
     const userRegister = await RedisClient.findKeysContainingString
       (SCAN_REDIS_KEY_TYPE.USER_REGISTRATION, email);
-    if (userRegister.length < 1) return 'Link đã hết hạn!';
+    if (userRegister.length < 1) return errorMessage(401, 'Link đã hết hạn!');
     let token = null;
     for(const user of userRegister) {
       const time = await RedisClient.timeRemaining(user?.key);
       if (time <= (EXPIRES_TIME_CHANGE - 30 * 60)) {
-        return 'Link đã hết hạn!';
+        return errorMessage(401, 'Link đã hết hạn!');
       }
 
       const createdUser = await UserModel.findOneAndUpdate({
@@ -105,7 +105,7 @@ export async function emailConfirmService(email) {
       token = Auth.getUserJwtToken(createdUser._id);
       await RedisClient.redisDel(user?.key);
     }
-    if (token === null) return false;
+    if (token === null) return errorMessage(401, 'Link đã hết hạn!');
     return token;
   } catch (error) {
     console.log(colors.red(`emailConfirmService error: ${error}`));
