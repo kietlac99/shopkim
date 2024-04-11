@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { body, param } from "express-validator";
+import { body, param, query } from "express-validator";
 
 import validatorErrorHandler from "../../api/validatorErrorHandler";
 
@@ -52,5 +52,10 @@ export const updateUserValidator = [
 
 export const restoreDeletedUserValidator = [
   body('keyword').isString().withMessage('Lỗi, từ khóa không khả dụng'),
+  validatorErrorHandler
+]
+
+export const confirmEmailValidator = [
+  query('email').isEmail().withMessage('Lỗi, email không khả dụng!'),
   validatorErrorHandler
 ]

@@ -56,21 +56,59 @@ export async function registerUserService(name, email, password, avatar) {
       result.secure_url = DEFAULT_AVATAR.secure_url;
     }
 
-    const user = await UserModel.create({
-      name,
-      email,
-      password: hashedPassword,
-      avatar: {
-        public_id: result.public_id,
-        url: result.secure_url
-      },
-    });
+    const confirmUrl = `${FRONTEND_URL}/#/register/confirm/${email}`;
 
-    const token = Auth.getUserJwtToken(user._id);
+    const keyExpiresTime = 31 * 60;
+    const redisKey = `USER_REGISTRATION_${email}`;
+    await RedisClient.setTextByKey(
+      redisKey,
+      keyExpiresTime,
+      JSON.stringify({
+        name, 
+        email, 
+        password: hashedPassword, 
+        avatar: {
+          public_id: result.public_id,
+          url: result.secure_url
+        }
+      })
+    );
 
-    return token;
+    await nodeMailerSendEmail(
+      SENDER_EMAIL, email, 'bucu130599@gmail.com', 'XÁC NHẬN EMAIL',
+      contentHTMLResetPasswordEmail(name, confirmUrl)
+    );
+    const payload = `Email được gửi đến: ${email}`;
+    return payload;
   } catch (error) {
     console.log(colors.red(`registerUserService error: ${error}`));
+    return errorMessage(500, ERROR_CODE.INTERNAL_SERVER_ERROR);
+  }
+}
+
+export async function emailConfirmService(email) {
+  try {
+    const userRegister = await RedisClient.findKeysContainingString
+      (USER_REGISTRATION, email);
+    if (userRegister.length < 1) return 'Link đã hết hạn!';
+    let token = null;
+    for(const user of userRegister) {
+      const time = await RedisClient.timeRemaining(user?.key);
+      if (time <= 60) {
+        return 'Link đã hết hạn!';
+      }
+
+      const createdUser = await UserModel.findOneAndUpdate({
+        name: user?.value?.email
+      }, { $set: user?.value }, { upsert: true });
+
+      token = Auth.getUserJwtToken(createdUser._id);
+      await RedisClient.redisDel(user?.key);
+    }
+    if (token === null) return false;
+    return token;
+  } catch (error) {
+    console.log(colors.red(`emailConfirmService error: ${error}`));
     return errorMessage(500, ERROR_CODE.INTERNAL_SERVER_ERROR);
   }
 }
