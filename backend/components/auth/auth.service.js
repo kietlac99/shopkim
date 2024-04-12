@@ -38,6 +38,11 @@ export function validatePasswordStrengthService(password) {
 
 export async function registerUserService(name, email, password, avatar) {
   try {
+    const deletedUsers = await RedisClient.findKeysContainingString(
+      SCAN_REDIS_KEY_TYPE.DELETED_USER, email);
+
+    if (deletedUsers.length < 1) return errorMessage(422, "Lỗi, email không khả dụng!");
+
     const countUser = await UserModel.countDocuments({ email: email });
     if (countUser > 0) return errorMessage(422, "Lỗi, email không khả dụng!");
 
