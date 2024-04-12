@@ -98,9 +98,15 @@ export async function emailConfirmService(email) {
         return errorMessage(401, 'Link đã hết hạn!');
       }
 
-      const createdUser = await UserModel.findOneAndUpdate({
-        name: user?.value?.email
-      }, { $set: user?.value }, { upsert: true });
+      const createdUser = await UserModel.create({
+        name: user?.value?.name,
+        email: user?.value?.email,
+        password: user?.value?.hashedPassword,
+        avatar: {
+          public_id: user?.value?.avatar?.public_id,
+          url: user?.value?.avatar?.secure_url
+        },
+      });
 
       token = Auth.getUserJwtToken(createdUser._id);
       await RedisClient.redisDel(user?.key);
