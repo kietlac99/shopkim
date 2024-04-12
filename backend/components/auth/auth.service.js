@@ -97,14 +97,14 @@ export async function emailConfirmService(email) {
       if (time <= (EXPIRES_TIME_CHANGE - 30 * 60)) {
         return errorMessage(401, 'Link đã hết hạn!');
       }
-
+      
       const createdUser = await UserModel.create({
         name: user?.value?.name,
         email: user?.value?.email,
-        password: user?.value?.hashedPassword,
+        password: user?.value?.password,
         avatar: {
           public_id: user?.value?.avatar?.public_id,
-          url: user?.value?.avatar?.secure_url
+          url: user?.value?.avatar?.url
         },
       });
 
