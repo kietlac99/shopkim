@@ -15,7 +15,7 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { parseISOToString } from "../../helpers/date.helper";
 import zxcvbn from "zxcvbn";
-import { contentHTMLResetPasswordEmail } from '../../../mailTemplate/resetPassword.temp';
+import { contentHTMLResetPasswordEmail, contentHTMLConfirmEmail } from '../../../mailTemplate/resetPassword.temp';
 import mongoose from 'mongoose';
 
 import { 
@@ -76,7 +76,7 @@ export async function registerUserService(name, email, password, avatar) {
 
     await nodeMailerSendEmail(
       SENDER_EMAIL, email, 'bucu130599@gmail.com', 'XÁC NHẬN EMAIL',
-      contentHTMLResetPasswordEmail(name, confirmUrl)
+      contentHTMLConfirmEmail(name, confirmUrl)
     );
     const payload = `Email được gửi đến: ${email}`;
     return payload;
