@@ -258,7 +258,7 @@ export async function deleteReviewService(productId, reviewId) {
     const ratings = reviews.reduce((acc, item) => item.rating + acc, 0) / numOfReviews;
     
     const keyExpiresTime = 30 * EXPIRES_TIME_CHANGE;
-    const deleteKey = `DELETED_REVIEW_${deletedReview.rating}_${deletedReview.comment}_${product.name}_${product._id}_${deletedReview.user}`;
+    const deleteKey = `DELETED_REVIEW_${deletedReview.rating}_${deletedReview.comment}_${product.name}_${product._id}_${reviewId}_${deletedReview.user}`;
     const deletedData = {
       productId,
       review: deletedReview
