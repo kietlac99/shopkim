@@ -24,6 +24,13 @@ router
   );
 
 router
+  .route('/register/email-confirm/:email')
+  .post(
+    AuthValidator.confirmEmailValidator,
+    AuthController.emailConfirmController
+  )
+
+router
   .route("/login")
   .post(
     AuthValidator.getLoginUserValidator,

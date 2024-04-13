@@ -54,3 +54,8 @@ export const restoreDeletedUserValidator = [
   body('keyword').isString().withMessage('Lỗi, từ khóa không khả dụng'),
   validatorErrorHandler
 ]
+
+export const confirmEmailValidator = [
+  param('email').isEmail().withMessage('Lỗi, email không khả dụng!'),
+  validatorErrorHandler
+]

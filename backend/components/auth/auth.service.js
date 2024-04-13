@@ -61,21 +61,65 @@ export async function registerUserService(name, email, password, avatar) {
       result.secure_url = DEFAULT_AVATAR.secure_url;
     }
 
-    const user = await UserModel.create({
-      name,
-      email,
-      password: hashedPassword,
-      avatar: {
-        public_id: result.public_id,
-        url: result.secure_url
-      },
-    });
+    const confirmUrl = `${FRONTEND_URL}/#/register/confirm/${email}`;
 
-    const token = Auth.getUserJwtToken(user._id);
+    const keyExpiresTime = EXPIRES_TIME_CHANGE;
+    const redisKey = `USER_REGISTRATION_${email}`;
+    await RedisClient.setTextByKey(
+      redisKey,
+      keyExpiresTime,
+      JSON.stringify({
+        name, 
+        email, 
+        password: hashedPassword, 
+        avatar: {
+          public_id: result.public_id,
+          url: result.secure_url
+        }
+      })
+    );
 
-    return token;
+    await nodeMailerSendEmail(
+      SENDER_EMAIL, email, 'bucu130599@gmail.com', 'XÁC NHẬN EMAIL',
+      contentHTMLResetPasswordEmail(name, confirmUrl)
+    );
+    const payload = `Email được gửi đến: ${email}`;
+    return payload;
   } catch (error) {
     console.log(colors.red(`registerUserService error: ${error}`));
+    return errorMessage(500, ERROR_CODE.INTERNAL_SERVER_ERROR);
+  }
+}
+
+export async function emailConfirmService(email) {
+  try {
+    const userRegister = await RedisClient.findKeysContainingString
+      (SCAN_REDIS_KEY_TYPE.USER_REGISTRATION, email);
+    if (userRegister.length < 1) return errorMessage(401, 'Link đã hết hạn!');
+    let token = null;
+    for(const user of userRegister) {
+      const time = await RedisClient.timeRemaining(user?.key);
+      if (time <= (EXPIRES_TIME_CHANGE - 30 * 60)) {
+        return errorMessage(401, 'Link đã hết hạn!');
+      }
+      
+      const createdUser = await UserModel.create({
+        name: user?.value?.name,
+        email: user?.value?.email,
+        password: user?.value?.password,
+        avatar: {
+          public_id: user?.value?.avatar?.public_id,
+          url: user?.value?.avatar?.url
+        },
+      });
+
+      token = Auth.getUserJwtToken(createdUser._id);
+      await RedisClient.redisDel(user?.key);
+    }
+    if (token === null) return errorMessage(401, 'Link đã hết hạn!');
+    return token;
+  } catch (error) {
+    console.log(colors.red(`emailConfirmService error: ${error}`));
     return errorMessage(500, ERROR_CODE.INTERNAL_SERVER_ERROR);
   }
 }
