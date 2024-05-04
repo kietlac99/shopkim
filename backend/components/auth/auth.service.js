@@ -438,3 +438,29 @@ export async function restoreDeletedUserService(keyword) {
     return errorMessage(500, ERROR_CODE.INTERNAL_SERVER_ERROR);
   }
 }
+
+export async function googleLoginService(name, email, provider, provideAccountId) {
+  try {
+    const user = UserModel.findOne({ provideAccountId, provider });
+    let token = null;
+    if (!user) {
+      const createdUser = await UserModel.create({
+        name,
+        email,
+        provider,
+        avatar: {
+          public_id: DEFAULT_AVATAR.public_id,
+          url: DEFAULT_AVATAR.secure_url
+        }
+      });
+
+      token = Auth.getUserJwtToken(createdUser._id);
+      
+    } else token = Auth.getUserJwtToken(user._id);
+
+    return token;
+  } catch (error) {
+    console.log(colors.red(`googleLoginService error: ${error}`));
+    return errorMessage(500, ERROR_CODE.INTERNAL_SERVER_ERROR);
+  }
+}

@@ -31,6 +31,13 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: "user",
     },
+    provideAccountId: {
+      type: String,
+      unique: true
+    },
+    provider: {
+      type: String
+    },
     resetPasswordToken: String,
     resetPasswordExpire: Date,
   },

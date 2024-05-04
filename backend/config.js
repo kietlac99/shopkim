@@ -34,7 +34,7 @@ export const CORS_OPTIONS = {
 
 export const BASE_PATH_API = '/api/v1';
 
-export const STATIC_PATH_FOLDER = 'public/images';
+export const STATIC_PATH_FOLDER = '/public/images';
 
 export const DEFAULT_LANGUAGE = 'vi';
 

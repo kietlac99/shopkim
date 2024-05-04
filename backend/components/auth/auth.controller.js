@@ -188,3 +188,13 @@ export async function restoreDeletedUserController(req, res) {
     return res.RH.error(error);
   }
 }
+
+export async function googleLoginController(req, res) {
+  try {
+    const { name, email, provider, provideAccountId } = req.body;
+    const process = await AuthService.googleLoginService(name, email, provider, provideAccountId);
+    return res.RH.success(process);
+  } catch (error) {
+    return res.RH.error(error);
+  }
+}

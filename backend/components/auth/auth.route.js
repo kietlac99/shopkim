@@ -99,7 +99,13 @@ router
     authorizeRoles("admin"),
     AuthValidator.restoreDeletedUserValidator,
     AuthController.restoreDeletedUserController
-  )
+  );
+
+router
+  .route('/google-login')
+  .post(
+    AuthController.googleLoginController
+  );
 
 router.use(errorHandler);
 
