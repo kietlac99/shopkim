@@ -441,7 +441,7 @@ export async function restoreDeletedUserService(keyword) {
 
 export async function googleLoginService(name, email, provider, provideAccountId) {
   try {
-    const user = UserModel.findOne({ provideAccountId, provider });
+    const user = UserModel.findOne({ provideAccountId, provider, email });
     let token = null;
     if (!user) {
       const createdUser = await UserModel.create({
