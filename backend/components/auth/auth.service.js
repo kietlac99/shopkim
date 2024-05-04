@@ -448,6 +448,7 @@ export async function googleLoginService(name, email, provider, provideAccountId
         name,
         email,
         provider,
+        provideAccountId,
         avatar: {
           public_id: DEFAULT_AVATAR.public_id,
           url: DEFAULT_AVATAR.secure_url
