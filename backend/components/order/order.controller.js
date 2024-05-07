@@ -96,7 +96,17 @@ export async function getLocationsController(req, res) {
 export async function restoreDeletedOrderController(req, res) {
   try {
     const { keyword } = req.body;
-    const process= await OrderService.restoreDeletedOrderService(keyword);
+    const process = await OrderService.restoreDeletedOrderService(keyword);
+    return res.RH.success(process);
+  } catch (error) {
+    return res.RH.error(error);
+  }
+}
+
+export async function revenueStatisticsController(req, res) {
+  try {
+    const { fromDate, toDate, year, monthYear } = req.body;
+    const process = await OrderService.revenueStatisticsService(year, monthYear, fromDate, toDate);
     return res.RH.success(process);
   } catch (error) {
     return res.RH.error(error);

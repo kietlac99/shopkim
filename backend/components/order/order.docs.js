@@ -429,3 +429,65 @@
  *           type: string
  *           example: "Internal server error"
  */
+
+/**
+ * @swagger
+ * /order/admin/revenue-statistics:
+ *   post:
+ *     summary: Revenue Statistics
+ *     security:
+ *       - jwt: []
+ *     tags:
+ *       - Order
+ *     parameters:
+ *       - name: body
+ *         in: body
+ *         required: true
+ *         properties:
+ *           year:
+ *             type: String
+ *           monthYear:
+ *             type: String  
+ *           fromDate:
+ *             type: String
+ *           toDate:
+ *             type: String
+ *         example: {
+ *           'year': 'YYYY',
+ *           'monthYear': 'YYYY-MM',
+ *           'fromDate': 'YYYY-MM-DD',
+ *           'toDate': 'YYYY-MM-DD'
+ *         }
+ *     responses:
+ *       200:
+ *         name: body
+ *         in: body
+ *         required: true
+ *         description: data report
+ *         schema:
+ *           type: object
+ *           properties:
+ *             $ref: '#/definitions/dashboard'
+ *           example: {
+ *              success: true
+ *           }
+ *       404:
+ *         description: When data cannot be process
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               $ref: '#/definitions/ValidatorErrorItem'
+ *           example: {
+ *             success: false,
+ *             errors: {
+ *                 "param": "EXISTS",
+ *               }
+ *           }
+ *       500:
+ *         description: When got server exception
+ *         schema:
+ *           type: string
+ *           example: "Internal server error"
+ */

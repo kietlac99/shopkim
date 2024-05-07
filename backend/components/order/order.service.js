@@ -12,6 +12,7 @@ import * as RedisClient from '../../util/Redis';
 
 import { scanService } from '../redisStore/redisStore.service';
 import mongoose from 'mongoose';
+import moment from "moment";
 
 export async function newOrderService(
   orderItems,
@@ -213,6 +214,76 @@ export async function restoreDeletedOrderService(keyword) {
     return true;
   } catch (error) {
     console.log(colors.red(`restoreDeletedOrderService error: ${error}`));
+    return errorMessage(500, ERROR_CODE.INTERNAL_SERVER_ERROR);
+  }
+}
+
+export async function revenueStatisticsService(year, monthYear, fromDate, toDate) {
+  try {
+    const matchCond = {};
+    const groupCond = {
+      _id: '$date',
+      totalMoney: {
+        $sum: '$totalPrice'
+      }
+    };
+    if (moment(year, 'YYYY', true).isValid() && typeof year === 'string' && year.trim() !== '') {
+      matchCond.year = year;
+      groupCond._id = '$monthYear';
+    }
+    else if (moment(monthYear, 'YYYY-MM', true).isValid() && typeof monthYear === 'string' && monthYear.trim() !== '') {
+      matchCond.monthYear = monthYear;
+    }
+    else if ((moment(fromDate, 'YYYY-MM', true).isValid() && typeof fromDate === 'string' && fromDate.trim() !== '')
+            || (moment(toDate, 'YYYY-MM-DD', true).isValid() && typeof toDate === 'string' && toDate.trim() !== '')) {
+      matchCond.date = {
+        $gte: fromDate,
+        $lte: toDate
+      }; 
+    }
+
+    const pipeline = [ 
+      { $project: {
+          date: {
+            $dateToString: {
+              format: "%Y-%m-%d",
+              date: "$paidAt"
+            }
+          },
+          monthYear: {
+            $dateToString: {
+              format: "%Y-%m",
+              date: "$paidAt"
+            }
+          },
+          year: {
+            $dateToString: {
+              format: "%Y",
+              date: "$paidAt"
+            }
+          },
+          totalPrice: 1
+      }},
+      { $match: matchCond }, 
+      { $group: groupCond },
+      { $sort: {
+        _id: 1
+      }}
+    ];
+
+    const revenue = await OrderModel.aggregate(pipeline);
+    let totalRevenue = 0;
+    revenue.forEach((item) => {
+      totalRevenue += item.totalMoney;
+    });
+    const payload = {
+      revenue,
+      totalRevenue
+    }
+    return payload;
+
+  } catch (error) {
+    console.log(colors.red(`revenueStatisticsService error: ${error}`));
     return errorMessage(500, ERROR_CODE.INTERNAL_SERVER_ERROR);
   }
 }
