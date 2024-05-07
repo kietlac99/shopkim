@@ -56,6 +56,13 @@ router.route('/restore-deleted-orders')
     authorizeRoles("admin"),
     OrderValidator.restoreDeletedOrdersValidator,
     OrderController.restoreDeletedOrderController
+  );
+  
+router.route('/admin/revenue-statistics')
+  .post(
+    isAuthenticatedUser(),
+    authorizeRoles('admin'),
+    OrderController.revenueStatisticsController
   )
 
 export default router;
