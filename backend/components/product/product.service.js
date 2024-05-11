@@ -49,7 +49,7 @@ export async function newProductService(body, user, productImages) {
 
 export async function getProductsService(query) {
   try {
-    const resPerPage = 4;
+    const resPerPage = 8;
     const productsCount = await ProductModel.countDocuments();
 
     const apiFeatures = new APIFeatures(ProductModel.find(), query)
