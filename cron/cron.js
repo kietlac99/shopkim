@@ -64,7 +64,7 @@ export default async function cronJob() {
     });
 
     // Schedule a job to ping the server every 4 minutes
-    cron.schedule('*/4 * * * *', async () => {
+    cron.schedule('*/10 * * * *', async () => {
         try {
             await axios({
                 url: `https://${API_DOCS_HOST}/ping`,
