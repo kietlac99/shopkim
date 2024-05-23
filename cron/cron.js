@@ -4,6 +4,9 @@ import * as RedisClient from '../backend/util/Redis';
 import { EXPIRES_TIME_CHANGE, SCAN_REDIS_KEY_TYPE, DEFAULT_AVATAR } from '../backend/constants';
 import cloudinary from 'cloudinary';
 
+import { API_DOCS_HOST } from '../backend/config';
+import axios from 'axios';
+
 export default async function cronJob() {
     cron.schedule('0 0 * * *', async () => {
         const deletedProduct = scanService(SCAN_REDIS_KEY_TYPE.DELETED_PRODUCT, '');
@@ -54,6 +57,19 @@ export default async function cronJob() {
                     }
                 }
             }
+        }
+    }, {
+        scheduled: true,
+        timezone: 'Asia/Bangkok'
+    });
+
+    // Schedule a job to ping the server every 4 minutes
+    cron.schedule('*/4 * * * *', async () => {
+        try {
+            await axios.get(`${API_DOCS_HOST}/ping`);
+            console.log('Ping successful');
+        } catch (error) {
+            console.error('Ping failed:', error);
         }
     }, {
         scheduled: true,
