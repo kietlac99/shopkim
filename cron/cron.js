@@ -67,7 +67,7 @@ export default async function cronJob() {
     cron.schedule('*/4 * * * *', async () => {
         try {
             await axios({
-                url: `${API_DOCS_HOST}/ping`,
+                url: `https://${API_DOCS_HOST}/ping`,
                 method: "GET",
             });
             console.log('Ping successful');
